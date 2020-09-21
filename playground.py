@@ -1,8 +1,9 @@
-d = {0: 0, 1: 1}
+import sys
+eps = sys.float_info.epsilon
+print((1 + eps / 2) - 1)
+print(1 + (eps / 2 - 1))
 
-def fab(n):
-    if not n in d:
-        d[n] = fab(n-1) + fab(n-2)
-    return d[n]
-
-print(fab(int(input())))
+print((1 - eps/2) + eps/2)
+print((1 + eps/2) - eps/2)
+# print(-(eps/2 - 1))
+# print(1 + eps / 2)
