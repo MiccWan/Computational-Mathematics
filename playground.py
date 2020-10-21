@@ -1,9 +1,5 @@
-import sys
-eps = sys.float_info.epsilon
-print((1 + eps / 2) - 1)
-print(1 + (eps / 2 - 1))
+import numpy as np
 
-print((1 - eps/2) + eps/2)
-print((1 + eps/2) - eps/2)
-# print(-(eps/2 - 1))
-# print(1 + eps / 2)
+x = np.array([1,2,3])
+
+A
