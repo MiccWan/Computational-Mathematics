@@ -1,37 +1,49 @@
+
+#4.6.6 Quasi-Newton Broden Levenberg
+#finding Jacobian
+
 import numpy as np
 
-f = lambda x: np.exp(x)
-I_f = np.e - 1          # integral from 0 to 1
-a, b = [0, 1]
+def fdjac(f , x, y):
+    delta = 10**(-10)
+    m = len(y)
+    n = len(x)
+    J = np.zeros((m,n))
+    I = np.eye(n)
+    
+    for j in range(n):
+        x_delta = x + delta*I[:,j]
+        J[:,j] = (f(*x_delta) - y)/delta
+        
+    return J
 
-m, n = list(map(int, input().split(',')))
+f = lambda u,v: np.array([u*v + v**2 -1, u*v**3 + u**2*v**2 + 1])
+A = np.array([[1 ,0], [-3,2]])
+x = np.array([-2 , 1])
+fk = f(*x)
+I = np.eye(2)
+Lambda = 10
 
-
-#### your code
-def method1(f, a, b, n):
-    xs = np.linspace(a, b, num=n)
-    x_bars = (xs[1:] + xs[:-1])/2
-    h  = xs[1] - xs[0]
-
-    print(x_bars)
-
-    return h * np.sum([f(x_bar) for x_bar in x_bars])
-
-def method2(f, a, b, n):
-    xs = np.linspace(a, b, num=n)
-    h  = xs[1] - xs[0]
-
-    def I(f, a, b):
-        return f(a) + 4 * f((a + b) / 2) + f(b)
-
-    return h / 6 * np.sum([I(f, xs[i], xs[i+1]) for i in range(n-1)])
-#### your code
-
-
-err = 1
-if m == 1:
-    err = abs(method1(f, a, b ,n) - I_f)
-if m == 2:
-    err = abs(method2(f, a, b ,n) - I_f)
-
-print(round(np.log10(err),3))
+while np.linalg.norm(fk)>10**(-10):
+    B = A.T@A + Lambda*I
+    z = A.T@fk
+    s = -np.linalg.solve(B,z)
+    x_new = x + s
+    f_new = f(*x_new)
+    
+    if np.linalg.norm(f_new,2) < np.linalg.norm(fk,2):
+        #Newton good
+        Lambda = Lambda/10
+        print(s.T@s)
+        A = A + 1/(s.T@s) * (f_new - fk - A@s)@s.T
+        x = x_new
+        fk = f_new
+        #print(x)
+    
+    else:
+        #steepest descent
+        Lambda = Lambda*4
+        A = fdjac(f, x, fk)
+        
+u,v = x
+print(x, f(u,v))
